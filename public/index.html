@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HYDRO_EXTRACTOR v1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #001E28; color: #00F9FF; font-family: monospace; overflow: hidden; }
+        .hologram { background: rgba(0, 249, 255, 0.05); border: 1px solid rgba(0, 249, 255, 0.2); backdrop-filter: blur(10px); }
+        .glow { text-shadow: 0 0 10px #00F9FF; }
+        @keyframes scanline { 0% { top: -100%; } 100% { top: 100%; } }
+        .scanner::after { content: ""; position: absolute; width: 100%; height: 2px; background: #00F9FF; top: 0; left: 0; animation: scanline 3s linear infinite; box-shadow: 0 0 15px #00F9FF; }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    <div class="scanner absolute inset-0 opacity-20 pointer-events-none"></div>
+    
+    <div class="hologram p-8 rounded-2xl w-full max-w-md border-t-4 border-[#00F9FF] shadow-[0_0_50px_rgba(0,249,255,0.1)]">
+        <h1 class="text-2xl font-black italic glow mb-2 uppercase">HYDRO_DOWNLOADER</h1>
+        <p class="text-[10px] opacity-60 mb-8 uppercase tracking-[4px]">Core Unit: Extraction_Active</p>
+
+        <input id="videoUrl" type="text" placeholder="PASTE_LINK_HERE" class="w-full bg-black/40 border border-[#00F9FF]/30 p-4 rounded text-sm mb-4 outline-none focus:border-[#00F9FF]">
+        
+        <button onclick="extract()" id="btn" class="w-full bg-[#00F9FF] text-[#001E28] font-bold py-4 rounded hover:bg-white transition-all uppercase tracking-widest">Start Extraction</button>
+
+        <div id="status" class="hidden mt-6 text-center text-[11px] font-bold">
+            <span class="animate-pulse">ANALYZING SIGNAL...</span>
+        </div>
+    </div>
+
+    <script>
+        async function extract() {
+            const url = document.getElementById('videoUrl').value;
+            const btn = document.getElementById('btn');
+            const status = document.getElementById('status');
+            
+            if(!url) return alert("INPUT_EMPTY");
+
+            status.classList.remove('hidden');
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`/api/extract?url=${encodeURIComponent(url)}`);
+                const data = await response.json();
+                
+                if(data.download_url) {
+                    window.location.href = data.download_url;
+                    status.innerHTML = "EXTRACTION_COMPLETE";
+                } else {
+                    alert("ERROR_FETCHING_SOURCE");
+                }
+            } catch (e) { alert("CONNECTION_FAILURE"); }
+            btn.disabled = false;
+        }
+    </script>
+</body>
+          </html>
